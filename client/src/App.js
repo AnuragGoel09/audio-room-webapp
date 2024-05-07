@@ -35,11 +35,11 @@ function App() {
   return (
     <Container>
       <Title>Audio Chat Room</Title>
-      {clientStatus=="not joined"?
+      {clientStatus==="not joined"?
         <RoomForm setClient={setClientStatus} setName={setDisplayName} setRoom={setRoomName} />:
-        clientStatus=="joining"?
+        clientStatus==="joining"?
           <Loader/>:
-          <Room/>}
+          <Room displayName={displayName} roomName={roomName} />}
     </Container>
   );
 }
