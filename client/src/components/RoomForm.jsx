@@ -64,9 +64,9 @@ export default function RoomForm(props) {
     <Container>
         <Form onSubmit={handle_enter_room}>
             <Label name="name">Display Name :</Label>
-            <Input type="text" name="name" placeholder="Enter you name" />
+            <Input type="text" name="name" placeholder="Enter you name" required />
             <Label name="room">Room Id :</Label>
-            <Input type="text" name="room" placeholder="Enter room id" />
+            <Input type="text" name="room" placeholder="Enter room id"  required/>
             <Input type="submit" name="submit" value="Enter room" style={{fontSize:'17px',cursor:'pointer'}} />
         </Form>
     </Container>
