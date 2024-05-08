@@ -15,8 +15,8 @@ const Container=styled.div`
 
 export default function Loader() {
   return (
-    <Container>
+    // <Container>
         <BounceLoader color="#378CE7" />
-    </Container>
+    // </Container>
   )
 }
