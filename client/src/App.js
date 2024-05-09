@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components'
 import AgoraRTC from "agora-rtc-sdk-ng"
 import appid from './appId.js'
-
 const Container=styled.div`
   background-color: white;
   width: 100%;
@@ -49,11 +48,6 @@ const Button=styled.div`
     &:hover{
         background-color: rgba(0,0,0,0.2);
     }
-`;
-const User=styled.div`
-    color: black;
-    font-size: 20px;
-    background-color: red;
 `;
 
 const Box=styled.div`
@@ -117,6 +111,37 @@ const Box3=styled.div`
   display: none;
   `;
 
+const Avatars=styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+`;
+
+const Choosed=styled.div`
+  width: 15%;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  border-radius: 50%;
+  cursor: pointer;
+`;
+
+const NotChoosed=styled.div`
+  width: 15%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const User=styled.div``;
+
+const Face=styled.div``;
+
+const Name=styled.div``;
+
 let join,loader,form,joined_options;
 let mic_button;
 
@@ -130,11 +155,11 @@ let audioTracks = {
 let rtcClient;
 let micMuted=true;
 
-const initRtc = async (name,roomId) => {
+const initRtc = async (name,roomId,avatar) => {
   rtcClient = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 
 
-  rtcClient.on('user-joined', handleUserJoined)
+  rtcClient.on('user-joined', ()=>{handleUserJoined(avatar)})
   rtcClient.on("user-published", handleUserPublished)
   rtcClient.on("user-left", handleUserLeft);
   
@@ -143,8 +168,13 @@ const initRtc = async (name,roomId) => {
   audioTracks.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
   audioTracks.localAudioTrack.setMuted(micMuted)
   await rtcClient.publish(audioTracks.localAudioTrack);
-
-  join.current.insertAdjacentHTML('beforeend', `<div class="speaker user-rtc-${rtcUid}" id="${rtcUid}"><p>${rtcUid}</p></div>`)
+  const Wrapper=`
+    <User>
+      <Face><img src=${avatar}/></Face>
+      <Name></Name>
+    </User>
+  `
+  join.current.insertAdjacentHTML('beforeend', Wrapper)
   // document.getElementById('members').insertAdjacentHTML('beforeend', `<div class="speaker user-rtc-${rtcUid}" id="${rtcUid}"><p>${rtcUid}</p></div>`)
   loader.current.style.display='none'
   join.current.style.display='flex'
@@ -183,7 +213,7 @@ let initVolumeIndicator = async () => {
 
 
 
-let handleUserJoined = async (user) => {
+let handleUserJoined = async (user,avatar) => {
   console.log('USER:', user)
  join.current.insertAdjacentHTML('beforeend', `<div class="speaker user-rtc-${user.uid}" id="${user.uid}"><p>${user.uid}</p></div>`)
 } 
@@ -205,10 +235,10 @@ let handleUserLeft = async (user) => {
 
 // let lobbyForm = document.getElementById('form')
 
-const enterRoom = async (e) => {
+const enterRoom = async (e,avatar) => {
   e.preventDefault()
   console.log("hello")
-  initRtc(e.target["name"].value,e.target["room"].value,join)
+  initRtc(e.target["name"].value,e.target["room"].value,join,avatar)
   form.current.style.display="none";
   loader.current.style.display="flex"
 }
@@ -244,19 +274,30 @@ function App() {
   join=useRef(null)
   joined_options=useRef(null)
   mic_button=useRef(null);
-
-  const [roomId,setRoomId]=useState(null)
+  const [avatar,setAvatar]=useState(1);
+  const [roomId,setRoomId]=useState(null);
   const [displayName,setDisplayName]=useState(null);
+  let avatars=[1,2,3,4,5,6,7,8];
+  const handleAvatar=(i)=>{
+    setAvatar(i);
+  }
   return (  
       <>
         <Container>
             <Title>Audio Chat Room</Title>
             <Box ref={form} >
               <Form onSubmit={(e)=>{
-                enterRoom(e);
+                enterRoom(e,`./avatars/avatar${avatar}.svg`);
                 setDisplayName(e.target["name"].value);
                 setRoomId(e.target["room"].value)
               }}>
+              <Label name="avatar">Choose Avatar :</Label>
+              <Avatars>
+                {avatars.map((i)=>(
+                  i==avatar?<Choosed><img src={`./avatars/avatar${i}.svg`}/></Choosed>:<NotChoosed  onClick={()=>handleAvatar(i)}><img src={`./avatars/avatar${i}.svg`}/></NotChoosed>
+                ))}
+
+              </Avatars>
               <Label name="name">Display Name :</Label>
               <Input type="text" name="name" placeholder="Enter you name" required />
               <Label name="room">Room Id :</Label>
